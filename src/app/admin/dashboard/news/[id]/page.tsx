@@ -19,10 +19,10 @@ import { ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
 const newsSchema = z.object({
-  title: z.string().min(5, 'Гарчиг 5-аас доошгүй тэмдэгттэй байх ёстой.'),
+  title: z.string().min(1, 'Гарчиг 1-аас доошгүй тэмдэгттэй байх ёстой.'),
   category: z.string().min(2, 'Ангилал оруулна уу.'),
-  excerpt: z.string().min(10, 'Товч агуулга 10-аас доошгүй тэмдэгттэй байх ёстой.'),
-  content: z.string().min(20, 'Агуулга 20-ос доошгүй тэмдэгттэй байх ёстой.'),
+  excerpt: z.string().min(1, 'Товч агуулга 1-аас доошгүй тэмдэгттэй байх ёстой.'),
+  content: z.string().min(2, 'Агуулга 2-ос доошгүй тэмдэгттэй байх ёстой.'),
   image: z.any().optional(),
 });
 

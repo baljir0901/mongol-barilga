@@ -43,8 +43,8 @@ export function ContactForm() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
     try {
-      // Add a new document with a generated id to the "mail" collection
-      await addDoc(collection(db, "mail"), {
+      // Add a new document with a generated id to the "baljir0901@gmail.com" collection
+      await addDoc(collection(db, "baljir0901@gmail.com"), {
         to: ['baljir0901@gmail.com'],
         message: {
           subject: `Шинэ санал хүсэлт: ${values.subject}`,

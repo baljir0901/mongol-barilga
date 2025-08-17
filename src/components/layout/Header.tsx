@@ -1,8 +1,7 @@
 'use client';
 import { useState } from 'react';
 import Link from 'next/link';
-import { Menu, X, Building2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Menu, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { usePathname } from 'next/navigation';
 
@@ -28,8 +27,7 @@ export function Header() {
         <div className="flex h-20 items-center justify-between">
           <Link href="/" className="flex items-center gap-3" onClick={() => setIsOpen(false)}>
             <div className="text-left">
-              <span className="font-bold font-headline text-xl tracking-wider">Jiguur Grand Group</span>
-              <p className="text-xs opacity-80 tracking-widest">Est. 1989</p>
+              <span className="font-bold font-headline text-xl tracking-wider">Монгол Барилга</span>
             </div>
           </Link>
 

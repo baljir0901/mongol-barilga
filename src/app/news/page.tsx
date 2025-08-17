@@ -1,40 +1,30 @@
+
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { ArrowRight } from 'lucide-react';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import type { NewsArticle } from '@/lib/types';
 
-const newsItems = [
-  {
-    slug: 'shine-tosol-ekhluulle',
-    title: 'Бид шинэ төсөл эхлүүллээ',
-    date: '2024-07-15',
-    category: 'Төсөл',
-    excerpt: 'Манай компани "Ногоон хотхон" нэртэй шинэ орон сууцны төслийг эхлүүлж байгааг дуулгахад таатай байна. Энэхүү төсөл нь байгальд ээлтэй...',
-    image: 'https://placehold.co/600x400.png',
-    aiHint: 'construction blueprint',
-  },
-  {
-    slug: 'chнарын-шагнал-хуртев',
-    title: 'Чанарын шагнал хүртэв',
-    date: '2024-06-28',
-    category: 'Нэр хүнд',
-    excerpt: 'Монголын Барилгын Үндэсний Ассоциациас зохион байгуулсан "Оны шилдэг барилга" шалгаруулалтаас манай "Шинэ-Оффис цамхаг" төсөл...',
-    image: 'https://placehold.co/600x400.png',
-    aiHint: 'award trophy',
-  },
-  {
-    slug: 'shine-технологи-nevtruullee',
-    title: 'Шинэ технологи нэвтрүүллээ',
-    date: '2024-05-10',
-    category: 'Технологи',
-    excerpt: 'Барилгын үр ашгийг нэмэгдүүлэх зорилгоор бид Герман улсын дэвшилтэт технологи болох модуляр барилгын системийг үйл ажиллагаандаа нэвтрүүллээ.',
-    image: 'https://placehold.co/600x400.png',
-    aiHint: 'modern technology',
-  },
-];
+// Revalidate the page every 60 seconds
+export const revalidate = 60;
 
-export default function NewsPage() {
+async function getNewsItems(): Promise<NewsArticle[]> {
+  const newsCollection = collection(db, 'news');
+  const q = query(newsCollection, orderBy('date', 'desc'));
+  const newsSnapshot = await getDocs(q);
+  const newsList = newsSnapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  } as NewsArticle));
+  return newsList;
+}
+
+export default async function NewsPage() {
+  const newsItems = await getNewsItems();
+
   return (
     <div className="container mx-auto px-4 py-16">
       <div className="text-center mb-12">
@@ -46,10 +36,10 @@ export default function NewsPage() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {newsItems.map((item) => (
-          <Card key={item.slug} className="flex flex-col overflow-hidden group">
+          <Card key={item.id} className="flex flex-col overflow-hidden group">
             <Link href={`/news/${item.slug}`} className="block">
               <div className="relative h-60 w-full">
-                <Image src={item.image} alt={item.title} layout="fill" objectFit="cover" className="transition-transform duration-300 group-hover:scale-105" data-ai-hint={item.aiHint} />
+                <Image src={item.image} alt={item.title} layout="fill" objectFit="cover" className="transition-transform duration-300 group-hover:scale-105" data-ai-hint={item.aiHint || 'news article'} />
               </div>
             </Link>
             <CardHeader>
@@ -72,6 +62,11 @@ export default function NewsPage() {
           </Card>
         ))}
       </div>
+       {newsItems.length === 0 && (
+          <div className="text-center col-span-full border rounded-lg p-12 bg-gray-50 mt-8">
+            <p className="text-muted-foreground">Одоогоор нийтлэгдсэн мэдээ байхгүй байна.</p>
+          </div>
+        )}
     </div>
   );
 }

@@ -2,65 +2,45 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { ChevronLeft } from 'lucide-react';
+import { collection, getDocs, query, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
+import type { NewsArticle } from '@/lib/types';
+import { notFound } from 'next/navigation';
 
-const newsItems = [
-  {
-    slug: 'shine-tosol-ekhluulle',
-    title: 'Бид шинэ төсөл эхлүүллээ',
-    date: '2024-07-15',
-    category: 'Төсөл',
-    excerpt: 'Манай компани "Ногоон хотхон" нэртэй шинэ орон сууцны төслийг эхлүүлж байгааг дуулгахад таатай байна. Энэхүү төсөл нь байгальд ээлтэй...',
-    image: 'https://placehold.co/1200x600.png',
-    aiHint: 'construction blueprint',
-    content: `
-      <p>Манай компани "Ногоон хотхон" нэртэй шинэ орон сууцны төслийг эхлүүлж байгааг дуулгахад таатай байна. Энэхүү төсөл нь байгальд ээлтэй, орчин үеийн технологид суурилсан бөгөөд нийт 500 айлын орон сууц, үйлчилгээний төв, ногоон байгууламжаас бүрдэнэ.</p>
-      <p>Төслийн гол онцлог нь сэргээгдэх эрчим хүчний эх үүсвэрийг ашиглаж, оршин суугчдын тав тухтай, эрүүл орчинд амьдрах нөхцөлийг бүрдүүлэхэд оршино. Бид энэхүү төслөөрөө Улаанбаатар хотын орон сууцны шинэ стандартыг тогтоохыг зорьж байна.</p>
-    `,
-  },
-  {
-    slug: 'chнарын-шагнал-хуртев',
-    title: 'Чанарын шагнал хүртэв',
-    date: '2024-06-28',
-    category: 'Нэр хүнд',
-    excerpt: 'Монголын Барилгын Үндэсний Ассоциациас зохион байгуулсан "Оны шилдэг барилга" шалгаруулалтаас манай "Шинэ-Оффис цамхаг" төсөл...',
-    image: 'https://placehold.co/1200x600.png',
-    aiHint: 'award trophy',
-    content: `
-      <p>Монголын Барилгын Үндэсний Ассоциациас жил бүр зохион байгуулдаг "Оны шилдэг барилга" шалгаруулалтаас манай "Шинэ-Оффис цамхаг" төсөл "Шилдэг оффисын барилга" төрөлд тэргүүн байр эзэллээ. Энэхүү шагнал нь манай хамт олны хичээл зүтгэл, чанарыг эрхэмлэдэг зарчмын үр дүн юм.</p>
-      <p>Биднийг дэмжиж, итгэл хүлээлгэсэн нийт харилцагчиддаа талархал илэрхийлье.</p>
-    `,
-  },
-  {
-    slug: 'shine-технологи-nevtruullee',
-    title: 'Шинэ технологи нэвтрүүллээ',
-    date: '2024-05-10',
-    category: 'Технологи',
-    excerpt: 'Барилгын үр ашгийг нэмэгдүүлэх зорилгоор бид Герман улсын дэвшилтэт технологи болох модуляр барилгын системийг үйл ажиллагаандаа нэвтрүүллээ.',
-    image: 'https://placehold.co/1200x600.png',
-    aiHint: 'modern technology',
-    content: `
-      <p>Барилгын үр ашгийг нэмэгдүүлэх, хугацааг богиносгох зорилгоор бид Герман улсын дэвшилтэт технологи болох модуляр барилгын системийг үйл ажиллагаандаа нэвтрүүллээ. Энэхүү технологи нь барилгын үндсэн хийцийг үйлдвэрт урьдчилан бэлтгэж, барилгын талбайд угсардаг тул цаг хугацаа, зардлыг хэмнэхээс гадна чанарын өндөр хяналтыг хангах боломжийг олгодог.</p>
-      <p>Бид шинэ технологийг ашиглан илүү хурдан, илүү чанартай үйлчилгээг хэрэглэгчиддээ хүргэх болно.</p>
-    `,
-  },
-];
+// Revalidate the page every 60 seconds
+export const revalidate = 60;
+
+async function getNewsItems() {
+  const newsCollection = collection(db, 'news');
+  const newsSnapshot = await getDocs(newsCollection);
+  return newsSnapshot.docs.map(doc => doc.data() as NewsArticle);
+}
 
 export async function generateStaticParams() {
+  const newsItems = await getNewsItems();
   return newsItems.map((item) => ({
     slug: item.slug,
   }));
 }
 
-function getNewsItem(slug: string) {
-  return newsItems.find((item) => item.slug === slug);
+async function getNewsItem(slug: string): Promise<NewsArticle | null> {
+  const newsCollection = collection(db, 'news');
+  const q = query(newsCollection, where('slug', '==', slug));
+  const querySnapshot = await getDocs(q);
+  
+  if (querySnapshot.empty) {
+    return null;
+  }
+  
+  const doc = querySnapshot.docs[0];
+  return { id: doc.id, ...doc.data() } as NewsArticle;
 }
 
-
-export default function NewsArticlePage({ params }: { params: { slug: string } }) {
-  const article = getNewsItem(params.slug);
+export default async function NewsArticlePage({ params }: { params: { slug:string } }) {
+  const article = await getNewsItem(params.slug);
 
   if (!article) {
-    return <div>Мэдээ олдсонгүй.</div>;
+    notFound();
   }
 
   return (
@@ -77,7 +57,7 @@ export default function NewsArticlePage({ params }: { params: { slug: string } }
       </header>
       
       <div className="relative w-full h-64 md:h-96 rounded-lg overflow-hidden mb-8">
-        <Image src={article.image} alt={article.title} layout="fill" objectFit="cover" data-ai-hint={article.aiHint} />
+        <Image src={article.image} alt={article.title} layout="fill" objectFit="cover" data-ai-hint={article.aiHint || 'news article'} />
       </div>
       
       <div 

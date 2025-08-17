@@ -27,7 +27,7 @@ export default function AdminLoginPage() {
     } catch (error: any) {
       toast({
         variant: 'destructive',
-        title: 'Нэвтрэхэд алдааff гарлаа',
+        title: 'Нэвтрэхdsf asdf sadэд алдааff гарлаа',
         description: error.message,
       });
     } finally {

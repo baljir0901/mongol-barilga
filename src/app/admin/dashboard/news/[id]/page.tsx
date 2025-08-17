@@ -20,14 +20,22 @@ import Link from 'next/link';
 
 const newsSchema = z.object({
   title: z.string().min(5, 'Гарчиг 5-аас доошгүй тэмдэгттэй байх ёстой.'),
-  slug: z.string().min(3, 'Слаг 3-аас доошгүй тэмдэгттэй байх ёстой.').regex(/^[a-z0-9-]+$/, 'Слаг зөвхөн жижиг үсэг, тоо, зураас ашиглах боломжтой.'),
   category: z.string().min(2, 'Ангилал оруулна уу.'),
   excerpt: z.string().min(10, 'Товч агуулга 10-аас доошгүй тэмдэгттэй байх ёстой.'),
-  content: z.string().min(20, 'Агуулга 20-аас доошгүй тэмдэгттэй байх ёстой.'),
+  content: z.string().min(20, 'Агуулга 20-ос доошгүй тэмдэгттэй байх ёстой.'),
   image: z.any().optional(),
 });
 
 type NewsFormValues = z.infer<typeof newsSchema>;
+
+// Function to generate a URL-friendly slug
+const generateSlug = (title: string) => {
+  return title
+    .toLowerCase()
+    .replace(/ /g, '-')
+    .replace(/[^\w-]+/g, '');
+};
+
 
 export default function NewsFormPage() {
   const router = useRouter();
@@ -43,7 +51,6 @@ export default function NewsFormPage() {
     resolver: zodResolver(newsSchema),
     defaultValues: {
       title: '',
-      slug: '',
       category: '',
       excerpt: '',
       content: '',
@@ -62,7 +69,6 @@ export default function NewsFormPage() {
           setInitialData(data);
           reset({
             title: data.title,
-            slug: data.slug,
             category: data.category,
             excerpt: data.excerpt,
             content: data.content,
@@ -89,8 +95,11 @@ export default function NewsFormPage() {
         imageUrl = await getDownloadURL(snapshot.ref);
       }
       
+      const slug = initialData?.slug || generateSlug(data.title);
+
       const articleData: Omit<NewsArticle, 'id'> = {
         ...data,
+        slug,
         date: new Date().toISOString().split('T')[0], // Set current date
         image: imageUrl,
       };
@@ -136,12 +145,6 @@ export default function NewsFormPage() {
               <Label htmlFor="title">Гарчиг</Label>
               <Input id="title" {...register('title')} />
               {errors.title && <p className="text-sm text-destructive">{errors.title.message}</p>}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="slug">Слаг (URL)</Label>
-              <Input id="slug" {...register('slug')} placeholder="shine-medee-geh-met" />
-              {errors.slug && <p className="text-sm text-destructive">{errors.slug.message}</p>}
             </div>
 
             <div className="space-y-2">

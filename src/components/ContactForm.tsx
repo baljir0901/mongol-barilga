@@ -16,6 +16,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
+import { collection, addDoc } from "firebase/firestore"; 
+import { db } from "@/lib/firebase";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "Нэрээ оруулна уу." }),
@@ -40,17 +42,37 @@ export function ContactForm() {
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsSubmitting(true);
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log(values);
-    
-    toast({
-      title: "Амжилттай илгээлээ",
-      description: "Таны санал хүсэлтийг хүлээн авлаа. Бид тантай удахгүй холбогдох болно.",
-    });
-    form.reset();
-    setIsSubmitting(false);
+    try {
+      // Add a new document with a generated id to the "mail" collection
+      await addDoc(collection(db, "mail"), {
+        to: ['baljir0901@gmail.com'],
+        message: {
+          subject: `Шинэ санал хүсэлт: ${values.subject}`,
+          html: `
+            <p><strong>Нэр:</strong> ${values.name}</p>
+            <p><strong>И-мэйл:</strong> ${values.email}</p>
+            <hr />
+            <p><strong>Зурвас:</strong></p>
+            <p>${values.message}</p>
+          `,
+        },
+      });
+
+      toast({
+        title: "Амжилттай илгээлээ",
+        description: "Таны санал хүсэлтийг хүлээн авлаа. Бид тантай удахгүй холбогдох болно.",
+      });
+      form.reset();
+    } catch (error) {
+      console.error("Error sending email: ", error);
+      toast({
+        variant: "destructive",
+        title: "Алдаа гарлаа",
+        description: "Санал хүсэлт илгээхэд алдаа гарлаа. Дахин оролдоно уу.",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (

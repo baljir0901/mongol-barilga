@@ -23,22 +23,24 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="absolute top-0 z-50 w-full bg-black/50 text-white">
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
-          <Link href="/" className="flex items-center gap-2" onClick={() => setIsOpen(false)}>
-            <Building2 className="h-6 w-6 text-primary" />
-            <span className="font-bold font-headline text-lg text-primary">Монгол Барилга</span>
+        <div className="flex h-20 items-center justify-between">
+          <Link href="/" className="flex items-center gap-3" onClick={() => setIsOpen(false)}>
+            <div className="text-left">
+              <span className="font-bold font-headline text-xl tracking-wider">Jiguur Grand Group</span>
+              <p className="text-xs opacity-80 tracking-widest">Est. 1989</p>
+            </div>
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-6 text-sm font-medium">
+          <nav className="hidden md:flex items-center space-x-8 text-sm font-medium">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 className={cn(
-                  'transition-colors hover:text-primary',
-                  pathname === link.href ? 'text-primary' : 'text-muted-foreground'
+                  'transition-colors hover:text-white/80',
+                  pathname === link.href ? 'text-white font-semibold' : 'text-white/70'
                 )}
               >
                 {link.label}
@@ -59,7 +61,7 @@ export function Header() {
       </div>
 
       {isOpen && (
-        <div className="md:hidden border-t">
+        <div className="md:hidden border-t border-white/20 bg-black/80 backdrop-blur-lg">
           <nav className="flex flex-col space-y-2 p-4">
             {navLinks.map((link) => (
               <Link
@@ -67,8 +69,8 @@ export function Header() {
                 href={link.href}
                 onClick={() => setIsOpen(false)}
                 className={cn(
-                  'block rounded-md p-2 text-base font-medium transition-colors hover:bg-accent/80 hover:text-accent-foreground',
-                  pathname === link.href ? 'bg-accent text-accent-foreground' : 'text-foreground'
+                  'block rounded-md p-3 text-base font-medium transition-colors hover:bg-white/10',
+                   pathname === link.href ? 'bg-white/20 text-white' : 'text-white/80'
                 )}
               >
                 {link.label}

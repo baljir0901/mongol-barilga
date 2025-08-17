@@ -51,14 +51,10 @@ const projects = [
 export default function Home() {
   return (
     <div className="flex flex-col">
-      <section className="relative w-full h-[60vh] md:h-[80vh] bg-cover bg-center flex items-center justify-center text-white" style={{ backgroundImage: "url('https://placehold.co/1920x1080.png')" }} data-ai-hint="construction site">
-        <div className="absolute inset-0 bg-black/50" />
+      <section className="relative w-full h-screen bg-cover bg-center flex items-center justify-center text-white" style={{ backgroundImage: "url('https://placehold.co/1920x1080.png')" }} data-ai-hint="construction site">
+        <div className="absolute inset-0 bg-black/60" />
         <div className="relative z-10 text-center px-4">
-          <h1 className="text-4xl md:text-6xl font-bold font-headline drop-shadow-lg">Монгол Барилга</h1>
-          <p className="mt-4 text-lg md:text-2xl max-w-2xl mx-auto drop-shadow-md">Бид таны мөрөөдлийн байшинг чанарын өндөр түвшинд барьж гүйцэтгэнэ.</p>
-          <Button asChild size="lg" className="mt-8 bg-accent text-accent-foreground hover:bg-accent/90">
-            <Link href="/contact">Холбоо барих</Link>
-          </Button>
+          <h1 className="text-4xl md:text-6xl font-bold font-headline drop-shadow-lg leading-tight max-w-4xl">ТЭНГЭРТ ТЭТГЭГДЭЖ, ГАЗАРТ ГАГНАГДСАН ИХ БҮТЭЭН БАЙГУУЛАГЧ</h1>
         </div>
       </section>
 

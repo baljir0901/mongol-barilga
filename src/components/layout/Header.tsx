@@ -47,9 +47,6 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-2">
-             <Button variant="ghost" size="sm" asChild className="hidden md:inline-flex">
-              <Link href="/admin/login">Админ</Link>
-            </Button>
             <button
               className="md:hidden rounded-md p-2"
               onClick={() => setIsOpen(!isOpen)}
@@ -77,9 +74,6 @@ export function Header() {
                 {link.label}
               </Link>
             ))}
-            <Button variant="outline" asChild>
-              <Link href="/admin/login">Админ</Link>
-            </Button>
           </nav>
         </div>
       )}
